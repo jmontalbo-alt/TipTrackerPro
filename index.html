@@ -187,7 +187,7 @@
     .cal-grid { gap: 4px; }
     .cal-cell { min-height: 50px; padding: 5px 4px; border-radius: 8px; }
     .cal-amt { font-size: 12px; }
-    .cal-rate { display: none; } /* hide per-day rate on narrow screens ‚Äî tap a day or use the Day tab */
+    .cal-rate { display: none; } /* hide per-day rate on narrow screens - tap a day or use the Day tab */
     .cal-dow { font-size: 10px; }
     .cal-nav button { width: 30px; height: 30px; }
   }
@@ -195,8 +195,8 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>üíµ Tip Tracker</h1>
-  <p class="subtitle">Log your tips and hours each day ‚Äî see your hourly average for the week, month, year, and all time.</p>
+  <h1>&#128181; Tip Tracker</h1>
+  <p class="subtitle">Log your tips and hours each day &mdash; see your hourly average for the week, month, year, and all time.</p>
 
   <!-- Cloud sync bar (only shown when Firebase is configured) -->
   <div id="sync-bar" class="sync-bar" hidden></div>
@@ -242,15 +242,15 @@
   </div>
 
   <div class="footer-actions">
-    <button class="btn-ghost" id="export-btn">‚¨á Export my data (backup)</button>
-    <button class="btn-ghost" id="import-btn">‚¨Ü Import data</button>
+    <button class="btn-ghost" id="export-btn">&#11015; Export my data (backup)</button>
+    <button class="btn-ghost" id="import-btn">&#11014; Import data</button>
     <input type="file" id="import-file" accept="application/json" style="display:none" />
   </div>
 </div>
 
 <script>
 /* ============================================================
-   Tip Tracker ‚Äî all logic lives here.
+   Tip Tracker - all logic lives here.
    Data is stored in your browser (localStorage) as a list of
    entries: { date: "YYYY-MM-DD", tips: number, hours: number }
    ============================================================ */
@@ -261,16 +261,16 @@ let currentView = "calendar";
 let calY = null, calM = null; // calendar cursor (year, 0-indexed month); set on first render
 
 /* ============================================================
-   Cloud sync (OPTIONAL) ‚Äî Firebase Firestore.
+   Cloud sync (OPTIONAL) - Firebase Firestore.
    Leave FIREBASE_CONFIG.apiKey blank to run purely on
    localStorage (no network, no accounts).
-   NOTE: the Firebase web config is NOT a secret ‚Äî it is meant to
+   NOTE: the Firebase web config is NOT a secret - it is meant to
    live in client code. Access is controlled by Firestore security
    rules, not by hiding these values.
 
    This points at the existing "tiptrackerpro-5d7e7" project (the
    one behind jmontalbo-alt.github.io/TipTrackerPro) so the same
-   project carries forward ‚Äî see tip-tracker-sync-setup.md for the
+   project carries forward - see tip-tracker-sync-setup.md for the
    two console steps (enable Email/Password auth, publish the
    locked-down rules) that make this safe to use.
    ============================================================ */
@@ -295,11 +295,11 @@ function save() {
 
 /* ---------- helpers ---------- */
 const fmtMoney = n => "$" + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const fmtRate  = n => isFinite(n) && n > 0 ? "$" + n.toFixed(2) + "/hr" : "‚Äî";
+const fmtRate  = n => isFinite(n) && n > 0 ? "$" + n.toFixed(2) + "/hr" : "\u2014";
 // Compact money for tight calendar cells (no cents): $150, $2,163
 const fmtMoneyCompact = n => "$" + Math.round(n).toLocaleString();
-// Rate without the "/hr" suffix ‚Äî used in narrow calendar cells to avoid clipping
-const fmtRateBare = n => isFinite(n) && n > 0 ? "$" + n.toFixed(2) : "‚Äî";
+// Rate without the "/hr" suffix - used in narrow calendar cells to avoid clipping
+const fmtRateBare = n => isFinite(n) && n > 0 ? "$" + n.toFixed(2) : "\u2014";
 
 function todayStr() {
   const d = new Date();
@@ -359,7 +359,7 @@ function renderSummary() {
       <div class="label">${c.label}</div>
       <div class="big">${fmtMoney(c.t.tips)}</div>
       <div class="rate">${fmtRate(c.t.rate)}</div>
-      <div class="sub">${c.t.hours.toLocaleString()} hrs ¬∑ ${c.t.days} day${c.t.days === 1 ? "" : "s"}</div>
+      <div class="sub">${c.t.hours.toLocaleString()} hrs \u00B7 ${c.t.days} day${c.t.days === 1 ? "" : "s"}</div>
     </div>
   `).join("");
 }
@@ -404,11 +404,11 @@ function renderCalendar() {
   area.innerHTML = `
     <div class="cal-head">
       <div class="cal-nav">
-        <button id="cal-prev" aria-label="Previous month">‚Äπ</button>
-        <button id="cal-next" aria-label="Next month">‚Ä∫</button>
+        <button id="cal-prev" aria-label="Previous month">\u2039</button>
+        <button id="cal-next" aria-label="Next month">\u203A</button>
       </div>
       <div class="cal-title">${MONTHS[calM]} ${calY}</div>
-      <div class="cal-month-total">${fmtMoney(mt.tips)} ¬∑ <b>${fmtRate(mt.rate)}</b></div>
+      <div class="cal-month-total">${fmtMoney(mt.tips)} \u00B7 <b>${fmtRate(mt.rate)}</b></div>
     </div>
     <div class="cal-grid">
       ${dows.map(d => `<div class="cal-dow">${d}</div>`).join("")}
@@ -441,7 +441,7 @@ function renderTable() {
   if (currentView === "calendar") { renderCalendar(); return; }
 
   if (entries.length === 0) {
-    area.innerHTML = `<div class="empty">No entries yet. Add your first day above! üëÜ</div>`;
+    area.innerHTML = `<div class="empty">No entries yet. Add your first day above! \u{1F446}</div>`;
     return;
   }
 
@@ -514,7 +514,7 @@ function renderTable() {
 
 /* ---------- actions ---------- */
 function addEntry(date, tips, hours) {
-  // one entry per day ‚Äî if the date exists, replace it
+  // one entry per day - if the date exists, replace it
   const existing = entries.find(e => e.date === date);
   if (existing) { existing.tips = tips; existing.hours = hours; }
   else { entries.push({ date, tips, hours }); }
@@ -600,7 +600,7 @@ document.getElementById("import-file").addEventListener("change", e => {
 /* ---------- cloud sync (Firebase, optional) ---------- */
 function syncEnabled() { return !!(FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey); }
 
-// Inject a classic <script> (Firebase compat SDK works from file:// ‚Äî ES modules don't)
+// Inject a classic <script> (Firebase compat SDK works from file:// - ES modules don't)
 function loadScript(src) {
   return new Promise((resolve, reject) => {
     const s = document.createElement("script");
@@ -671,7 +671,7 @@ function cloudPush() {
 }
 
 function doSignIn(email, password, create) {
-  if (!fb) { showSyncError("Sync isn't loaded ‚Äî check your connection and reload."); return; }
+  if (!fb) { showSyncError("Sync isn't loaded \u2014 check your connection and reload."); return; }
   if (!email || !password) { showSyncError("Enter an email and password."); return; }
   const req = create
     ? fb.auth.createUserWithEmailAndPassword(email, password)
@@ -682,10 +682,10 @@ function doSignIn(email, password, create) {
 function prettyAuthError(err) {
   const c = (err && err.code) || "";
   if (c.includes("invalid-credential") || c.includes("wrong-password") || c.includes("user-not-found")) return "Wrong email or password.";
-  if (c.includes("email-already-in-use")) return "That email already has an account ‚Äî sign in instead.";
+  if (c.includes("email-already-in-use")) return "That email already has an account \u2014 sign in instead.";
   if (c.includes("weak-password")) return "Password must be at least 6 characters.";
   if (c.includes("invalid-email")) return "That doesn't look like a valid email.";
-  if (c.includes("network")) return "Network error ‚Äî check your connection.";
+  if (c.includes("network")) return "Network error \u2014 check your connection.";
   return "Sign-in failed. Please try again.";
 }
 
@@ -703,7 +703,7 @@ function renderSyncBar() {
   if (fbUser) {
     bar.innerHTML =
       `<span class="sync-dot on"></span>` +
-      `<span class="sync-state">Synced ¬∑ <b>${fbUser.email}</b></span>` +
+      `<span class="sync-state">Synced \u00B7 <b>${fbUser.email}</b></span>` +
       `<button class="btn-ghost sync-btn" id="sync-signout">Sign out</button>` +
       `<span id="sync-msg" class="sync-msg"></span>`;
     document.getElementById("sync-signout").addEventListener("click", () => fb.auth.signOut());
